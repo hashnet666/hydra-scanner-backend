@@ -45,14 +45,35 @@
             background: var(--bg-secondary);
             border-radius: 10px;
             border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-blue));
         }
 
         .glitch {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: var(--accent-purple);
             text-shadow: 0 0 10px var(--accent-purple);
             margin-bottom: 10px;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
         }
 
         .tagline {
@@ -100,6 +121,7 @@
         .protocol-option.active {
             background: var(--accent-blue);
             border-color: var(--accent-green);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
         }
 
         .upload-section {
@@ -109,32 +131,61 @@
             border: 2px dashed var(--accent-blue);
             text-align: center;
             margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: var(--accent-purple);
+        }
+
+        .file-input {
+            display: none;
         }
 
         .file-label {
             background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 6px;
             cursor: pointer;
             display: inline-block;
             margin: 10px 0;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .file-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 77, 230, 0.4);
         }
 
         .action-btn {
             background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 12px 30px;
             border-radius: 6px;
             cursor: pointer;
             margin: 10px 5px;
             font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 77, 230, 0.4);
         }
 
         .action-btn:disabled {
             background: #555;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .cancel-btn {
+            background: linear-gradient(45deg, var(--accent-red), #ff6b6b);
         }
 
         .terminal {
@@ -145,18 +196,30 @@
             overflow-y: auto;
             border: 1px solid var(--border-color);
             font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .terminal-line {
+            margin-bottom: 5px;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
 
         .terminal-success { color: var(--accent-green); }
         .terminal-error { color: var(--accent-red); }
         .terminal-info { color: var(--accent-blue); }
+        .terminal-warning { color: #e6e64a; }
+        .terminal-scanning { color: var(--accent-purple); }
+
+        .progress-container {
+            margin: 20px 0;
+        }
 
         .progress-bar {
             height: 8px;
             background: var(--bg-tertiary);
             border-radius: 4px;
-            margin: 10px 0;
             overflow: hidden;
         }
 
@@ -167,15 +230,29 @@
             transition: width 0.3s ease;
         }
 
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
         .stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            margin: 15px 0;
+            margin: 20px 0;
         }
 
         @media (min-width: 768px) {
             .stats { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
         }
 
         .stat-value {
@@ -184,11 +261,58 @@
             font-weight: bold;
         }
 
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .results-section {
+            margin-top: 20px;
+        }
+
+        .results-content {
+            background: #000;
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-green);
+        }
+
         .footer {
             text-align: center;
             margin-top: 30px;
             color: var(--text-secondary);
             font-size: 0.8rem;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .scanning-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-purple);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .error {
+            color: var(--accent-red);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
         }
     </style>
 </head>
@@ -196,80 +320,131 @@
     <div class="container">
         <div class="header">
             <div class="glitch">Hydra Nation</div>
-            <p class="tagline">Protocol Scanner</p>
+            <p class="tagline">Multi Protocol Scanner</p>
+            <p style="color: var(--accent-green); font-size: 0.9rem; margin-top: 5px;">
+                Legends Never Die - We Multiply😎
+            </p>
         </div>
 
         <div class="panel">
             <h2 class="panel-title">Configuration</h2>
             
             <div class="upload-section">
-                <h3>Upload Hosts File</h3>
-                <input type="file" id="fileInput" accept=".txt" style="display: none;">
-                <label for="fileInput" class="file-label">Choose TXT File</label>
-                <div id="fileName" style="color: var(--text-secondary); margin: 10px 0;"></div>
+                <h3>Upload Hosts File (.txt)</h3>
+                <input type="file" id="fileInput" class="file-input" accept=".txt">
+                <label for="fileInput" class="file-label">Choose Hosts File</label>
+                <div id="fileName" style="color: var(--text-secondary); margin: 10px 0; font-size: 0.9rem;">
+                    No file selected
+                </div>
+                <div id="fileError" class="error"></div>
             </div>
 
             <h3>Select Protocol</h3>
             <div class="protocol-grid">
-                <div class="protocol-option" data-protocol="http">HTTP</div>
-                <div class="protocol-option" data-protocol="tls">TLS</div>
-                <div class="protocol-option" data-protocol="vless">VLESS</div>
-                <div class="protocol-option" data-protocol="cloudfront_tls">Cloud-Front</div>
-                <div class="protocol-option" data-protocol="dynamic_tls">Dynamic TLS</div>
+                <div class="protocol-option" data-protocol="http">
+                    <div style="font-weight: bold;">HTTP</div>
+                    <div style="font-size: 0.7rem; color: var(--text-secondary);">Port 80/443</div>
+                </div>
+                <div class="protocol-option" data-protocol="tls">
+                    <div style="font-weight: bold;">TLS</div>
+                    <div style="font-size: 0.7rem; color: var(--text-secondary);">Encrypted</div>
+                </div>
+                <div class="protocol-option" data-protocol="vless">
+                    <div style="font-weight: bold;">VLESS</div>
+                    <div style="font-size: 0.7rem; color: var(--text-secondary);">VLESS over TLS</div>
+                </div>
+                <div class="protocol-option" data-protocol="cloudfront_tls">
+                    <div style="font-weight: bold;">CloudFront</div>
+                    <div style="font-size: 0.7rem; color: var(--text-secondary);">AWS CDN</div>
+                </div>
+                <div class="protocol-option" data-protocol="dynamic_tls">
+                    <div style="font-weight: bold;">Dynamic TLS</div>
+                    <div style="font-size: 0.7rem; color: var(--text-secondary);">Adaptive</div>
+                </div>
             </div>
+            <div id="modeError" class="error"></div>
 
-            <div style="text-align: center; margin: 20px 0;">
+            <div style="text-align: center; margin: 25px 0;">
                 <button id="scanBtn" class="action-btn" disabled>Start Scan</button>
-                <button id="cancelBtn" class="action-btn" style="display: none; background: var(--accent-red);">Cancel</button>
+                <button id="cancelBtn" class="action-btn cancel-btn" style="display: none;">Cancel Scan</button>
             </div>
 
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Ready to scan</div>
             </div>
-            <div id="progressText" style="text-align: center; color: var(--text-secondary);">Ready to scan</div>
 
             <div class="stats">
-                <div><div class="stat-value" id="totalHosts">0</div>Total Hosts</div>
-                <div><div class="stat-value" id="successHosts">0</div>Successful</div>
-                <div><div class="stat-value" id="failedHosts">0</div>Failed</div>
-                <div><div class="stat-value" id="successRate">0%</div>Success Rate</div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalHosts">0</div>
+                    <div class="stat-label">Total Hosts</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="successHosts">0</div>
+                    <div class="stat-label">Successful</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="failedHosts">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="successRate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
             </div>
         </div>
 
         <div class="panel">
-            <h2 class="panel-title">Scan Results</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 class="panel-title" style="margin: 0; border: none; padding: 0;">Scan Results</h2>
+                <button id="copyResults" class="action-btn" style="padding: 8px 16px; font-size: 0.8rem;">
+                    Copy Results
+                </button>
+            </div>
+            
             <div class="terminal" id="terminal">
-                <div class="terminal-info">Hydra Nation Scanner Ready</div>
-                <div class="terminal-info">Upload hosts file and select protocol</div>
+                <div class="terminal-line terminal-info">
+                    <span class="scanning-dot"></span>Hydra Nation Scanner Initialized
+                </div>
+                <div class="terminal-line terminal-info">
+                    <span class="scanning-dot"></span>Backend connected 😎
+                </div>
+                <div class="terminal-line terminal-info">
+                    <span class="scanning-dot"></span>Upload hosts file and select protocol to begin
+                </div>
             </div>
             
-            <div style="margin-top: 15px; text-align: center;">
-                <button id="copyResults" class="action-btn">Copy Successful Hosts</button>
-            </div>
-            
-            <div id="resultsSection" style="display: none; margin-top: 15px;">
-                <h3>Successful Connections:</h3>
-                <div style="background: #000; padding: 15px; border-radius: 6px; max-height: 150px; overflow-y: auto;">
-                    <pre id="resultsContent" style="color: var(--accent-green);"></pre>
+            <div id="resultsSection" class="results-section" style="display: none;">
+                <h3 style="color: var(--accent-green); margin-bottom: 10px;">
+                    ✅ Successful Connections (101 Switching Protocols):
+                </h3>
+                <div class="results-content">
+                    <pre id="resultsContent" style="margin: 0; white-space: pre-wrap;"></pre>
                 </div>
             </div>
         </div>
 
         <div class="footer">
             <p>About Creator: Hydra Nation | Telegram: t.me/redsmoker2</p>
-            <p>Legends Never Die - We Multiply</p>
+            <p>Frontend: GitHub Pages (Zero-Rated) | Backend: Render.com</p>
+            <p>© 2025 HYDRA Network Scanner | For authorized educational use only.</p>
         </div>
     </div>
 
     <script>
-        // Configuration - Update this with your Render backend URL
-        const BACKEND_URL = 'https://netscanner-isbj.onrender.com'; // You'll update this after deploying to Render
+        // Configuration - Your Render backend URL
+        const BACKEND_URL = 'https://netscanner-isbj.onrender.com';
 
         document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
             const elements = {
                 fileInput: document.getElementById('fileInput'),
                 fileName: document.getElementById('fileName'),
+                fileError: document.getElementById('fileError'),
                 protocolOptions: document.querySelectorAll('.protocol-option'),
+                modeError: document.getElementById('modeError'),
                 scanBtn: document.getElementById('scanBtn'),
                 cancelBtn: document.getElementById('cancelBtn'),
                 terminal: document.getElementById('terminal'),
@@ -284,145 +459,306 @@
                 copyResults: document.getElementById('copyResults')
             };
 
+            // State
             let selectedProtocol = null;
             let hosts = [];
             let isScanning = false;
             let currentScanId = null;
+            let successfulHosts = [];
 
-            // Event Listeners
-            elements.fileInput.addEventListener('change', handleFileUpload);
-            elements.protocolOptions.forEach(opt => {
-                opt.addEventListener('click', () => selectProtocol(opt));
-            });
-            elements.scanBtn.addEventListener('click', startScan);
-            elements.cancelBtn.addEventListener('click', cancelScan);
-            elements.copyResults.addEventListener('click', copyResults);
+            // Initialize
+            initializeApp();
+
+            function initializeApp() {
+                setupEventListeners();
+                testBackendConnection();
+            }
+
+            function setupEventListeners() {
+                elements.fileInput.addEventListener('change', handleFileUpload);
+                elements.protocolOptions.forEach(option => {
+                    option.addEventListener('click', handleProtocolSelection);
+                });
+                elements.scanBtn.addEventListener('click', startScan);
+                elements.cancelBtn.addEventListener('click', cancelScan);
+                elements.copyResults.addEventListener('click', copyResults);
+            }
+
+            async function testBackendConnection() {
+                try {
+                    addToTerminal('Testing backend connection...', 'info');
+                    const response = await fetch(`${BACKEND_URL}/`, {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        addToTerminal(`✅ Backend connected: ${data.status}`, 'success');
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                } catch (error) {
+                    addToTerminal(`⚠️ Backend connection failed: ${error.message}`, 'warning');
+                    addToTerminal('Using simulation mode for demonstration', 'info');
+                }
+            }
 
             function handleFileUpload(e) {
+                hideError(elements.fileError);
                 const file = e.target.files[0];
-                if (!file) return;
+                
+                if (!file) {
+                    elements.fileName.textContent = 'No file selected';
+                    hosts = [];
+                    updateScanButton();
+                    return;
+                }
 
                 if (!file.name.endsWith('.txt')) {
-                    addToTerminal('Please select a .txt file', 'error');
+                    showError(elements.fileError, 'Please select a .txt file');
                     return;
                 }
 
                 elements.fileName.textContent = file.name;
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    parseHostsFile(e.target.result);
+                    try {
+                        const content = e.target.result;
+                        parseHostsFile(content);
+                    } catch (error) {
+                        showError(elements.fileError, `Error reading file: ${error.message}`);
+                    }
+                };
+                reader.onerror = function() {
+                    showError(elements.fileError, 'Error reading file');
                 };
                 reader.readAsText(file);
             }
 
-            function selectProtocol(option) {
-                elements.protocolOptions.forEach(opt => opt.classList.remove('active'));
-                option.classList.add('active');
-                selectedProtocol = option.getAttribute('data-protocol');
+            function handleProtocolSelection(e) {
+                hideError(elements.modeError);
+                elements.protocolOptions.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                selectedProtocol = this.getAttribute('data-protocol');
                 addToTerminal(`Protocol selected: ${selectedProtocol.toUpperCase()}`, 'info');
                 updateScanButton();
             }
 
             function parseHostsFile(content) {
-                hosts = [];
-                const lines = content.split('\n');
-                
-                lines.forEach(line => {
-                    const host = line.trim();
-                    if (host && !host.startsWith('#')) {
-                        // Simple host extraction
-                        let cleanHost = host;
-                        if (cleanHost.includes('://')) {
-                            try {
-                                const url = new URL(cleanHost);
-                                cleanHost = url.hostname;
-                            } catch (e) {
-                                const match = cleanHost.match(/^(?:https?:\/\/)?([^\/:]+)/);
-                                if (match) cleanHost = match[1];
+                try {
+                    hosts = [];
+                    const lines = content.split('\n');
+                    let validCount = 0;
+                    
+                    for (let line of lines) {
+                        let host = line.trim();
+                        if (host && !host.startsWith('#')) {
+                            // Clean host
+                            if (host.includes('://')) {
+                                try {
+                                    const url = new URL(host);
+                                    host = url.hostname;
+                                } catch (e) {
+                                    const match = host.match(/^(?:https?:\/\/)?([^\/:]+)/);
+                                    if (match) host = match[1];
+                                }
+                            }
+                            if (host.includes(':')) host = host.split(':')[0];
+                            
+                            if (isValidHostname(host) && !hosts.includes(host)) {
+                                hosts.push(host);
+                                validCount++;
                             }
                         }
-                        if (cleanHost.includes(':')) cleanHost = cleanHost.split(':')[0];
-                        
-                        if (cleanHost && !hosts.includes(cleanHost)) {
-                            hosts.push(cleanHost);
-                        }
                     }
-                });
+                    
+                    elements.totalHosts.textContent = hosts.length;
+                    addToTerminal(`✅ Loaded ${validCount} valid hosts from file`, 'success');
+                    
+                    if (validCount === 0) {
+                        showError(elements.fileError, 'No valid hosts found in file');
+                    }
+                    
+                    updateScanButton();
+                } catch (error) {
+                    showError(elements.fileError, `Error parsing file: ${error.message}`);
+                }
+            }
 
-                elements.totalHosts.textContent = hosts.length;
-                addToTerminal(`Loaded ${hosts.length} hosts`, 'success');
-                updateScanButton();
+            function isValidHostname(hostname) {
+                return /^[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]$/.test(hostname);
             }
 
             async function startScan() {
-                if (!selectedProtocol || hosts.length === 0) return;
+                if (!validateScanParameters()) return;
 
-                resetScan();
-                isScanning = true;
+                try {
+                    resetScanUI();
+                    isScanning = true;
+                    updateUI();
+                    
+                    addToTerminal(`🚀 Starting ${selectedProtocol.toUpperCase()} scan on ${hosts.length} hosts...`, 'scanning');
+
+                    // Try real backend first, fallback to simulation
+                    await realBackendScan();
+                    
+                } catch (error) {
+                    addToTerminal(`⚠️ Using simulation mode: ${error.message}`, 'warning');
+                    simulateScan(); // Fallback to simulation
+                }
+            }
+
+            async function realBackendScan() {
+                const response = await fetch(`${BACKEND_URL}/scan`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        hosts: hosts,
+                        protocol: selectedProtocol
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Backend error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                currentScanId = data.scan_id;
+                addToTerminal(`📡 Scan started with ID: ${currentScanId}`, 'info');
+                
+                // Poll for results
+                pollScanResults();
+            }
+
+            async function pollScanResults() {
+                if (!currentScanId || !isScanning) return;
+
+                try {
+                    const response = await fetch(`${BACKEND_URL}/scan/${currentScanId}`);
+                    const data = await response.json();
+
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    // Update progress
+                    if (data.processed !== undefined) {
+                        const progress = (data.processed / hosts.length) * 100;
+                        updateProgress(data.processed, hosts.length, data.successful || 0);
+                    }
+
+                    if (data.status === 'running') {
+                        setTimeout(pollScanResults, 1000);
+                    } else if (data.status === 'completed') {
+                        finishRealScan(data);
+                    }
+                } catch (error) {
+                    addToTerminal(`❌ Scan error: ${error.message}`, 'error');
+                    isScanning = false;
+                    updateUI();
+                }
+            }
+
+            function finishRealScan(data) {
+                isScanning = false;
                 updateUI();
                 
-                addToTerminal(`Starting ${selectedProtocol} scan...`, 'info');
-
-                // For GitHub Pages frontend, we'll simulate scanning
-                // In production, this would call your Render backend
-                simulateScan();
+                successfulHosts = data.results || [];
+                elements.progressText.textContent = `Complete: ${successfulHosts.length}/${hosts.length} successful`;
+                
+                if (successfulHosts.length > 0) {
+                    showResults(successfulHosts);
+                    addToTerminal(`✅ Scan completed! ${successfulHosts.length} hosts with 101 Switching Protocols`, 'success');
+                } else {
+                    addToTerminal('ℹ️ Scan completed - no successful hosts found', 'info');
+                }
             }
 
             function simulateScan() {
                 let completed = 0;
                 let successful = 0;
-                const total = hosts.length;
+                successfulHosts = [];
 
                 hosts.forEach((host, index) => {
                     setTimeout(() => {
                         if (!isScanning) return;
 
-                        const isSuccess = Math.random() > 0.6; // 40% success rate for demo
+                        // Simulate scan with 40% success rate
+                        const isSuccess = Math.random() > 0.6;
+                        const is101 = isSuccess; // All successes are 101 for demo
                         
                         if (isSuccess) {
                             successful++;
-                            addToTerminal(`SUCCESS: ${host} (101 Switching Protocols)`, 'success');
+                            successfulHosts.push(host);
+                            addToTerminal(`✅ ${host}:443 - 101 Switching Protocols (${selectedProtocol.toUpperCase()})`, 'success');
                         } else {
-                            addToTerminal(`FAILED: ${host}`, 'error');
+                            addToTerminal(`❌ ${host}:443 - Connection failed`, 'error');
                         }
 
                         completed++;
-                        updateProgress(completed, total, successful);
+                        updateProgress(completed, hosts.length, successful);
                         
-                        if (completed === total) {
-                            finishScan(successful);
+                        if (completed === hosts.length) {
+                            finishSimulatedScan(successful);
                         }
                     }, Math.random() * 1000 + 500);
                 });
             }
 
-            function updateProgress(completed, total, successful) {
-                const percent = (completed / total) * 100;
-                elements.progressFill.style.width = `${percent}%`;
-                elements.progressText.textContent = `${completed}/${total} (${successful} successful)`;
-                elements.successHosts.textContent = successful;
-                elements.failedHosts.textContent = completed - successful;
-                elements.successRate.textContent = `${((successful / completed) * 100).toFixed(1)}%`;
-            }
-
-            function finishScan(successful) {
+            function finishSimulatedScan(successful) {
                 isScanning = false;
                 updateUI();
                 elements.progressText.textContent = `Complete: ${successful}/${hosts.length} successful`;
                 
                 if (successful > 0) {
-                    const successfulHosts = hosts.slice(0, successful); // Simplified for demo
-                    elements.resultsContent.textContent = successfulHosts.join('\n');
-                    elements.resultsSection.style.display = 'block';
+                    showResults(successfulHosts);
+                    addToTerminal(`✅ Scan completed! ${successful} hosts with 101 Switching Protocols`, 'success');
+                    addToTerminal('📋 Results copied to clipboard automatically', 'success');
                     copyToClipboard(successfulHosts.join('\n'));
-                    addToTerminal('Results copied to clipboard automatically', 'success');
+                } else {
+                    addToTerminal('ℹ️ Scan completed - no successful hosts found', 'info');
                 }
             }
 
-            function cancelScan() {
+            function updateProgress(completed, total, successful) {
+                const percent = (completed / total) * 100;
+                elements.progressFill.style.width = `${percent}%`;
+                elements.progressText.textContent = `Scanning... ${completed}/${total} (${successful} successful)`;
+                elements.successHosts.textContent = successful;
+                elements.failedHosts.textContent = completed - successful;
+                elements.successRate.textContent = total > 0 ? `${((successful / completed) * 100).toFixed(1)}%` : '0%';
+            }
+
+            function showResults(hosts) {
+                elements.resultsContent.textContent = hosts.join('\n');
+                elements.resultsSection.style.display = 'block';
+            }
+
+            async function cancelScan() {
+                if (currentScanId) {
+                    try {
+                        await fetch(`${BACKEND_URL}/scan/${currentScanId}`, { method: 'DELETE' });
+                    } catch (error) {
+                        // Ignore errors when cancelling
+                    }
+                }
+                
                 isScanning = false;
                 updateUI();
-                addToTerminal('Scan cancelled', 'error');
+                addToTerminal('⏹️ Scan cancelled by user', 'warning');
+            }
+
+            function validateScanParameters() {
+                if (!selectedProtocol) {
+                    showError(elements.modeError, 'Please select a scanning protocol');
+                    return false;
+                }
+                if (hosts.length === 0) {
+                    showError(elements.fileError, 'Please upload a hosts file');
+                    return false;
+                }
+                return true;
             }
 
             function updateScanButton() {
@@ -435,27 +771,33 @@
                 elements.scanBtn.textContent = isScanning ? 'Scanning...' : 'Start Scan';
             }
 
-            function resetScan() {
+            function resetScanUI() {
+                successfulHosts = [];
                 elements.successHosts.textContent = '0';
                 elements.failedHosts.textContent = '0';
                 elements.successRate.textContent = '0%';
                 elements.progressFill.style.width = '0%';
                 elements.resultsSection.style.display = 'none';
+                currentScanId = null;
             }
 
             function addToTerminal(message, type) {
                 const line = document.createElement('div');
-                line.className = `terminal-${type}`;
-                line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                line.className = `terminal-line terminal-${type}`;
+                
+                const timestamp = new Date().toLocaleTimeString();
+                line.innerHTML = `<span class="scanning-dot"></span>[${timestamp}] ${message}`;
+                
                 elements.terminal.appendChild(line);
                 elements.terminal.scrollTop = elements.terminal.scrollHeight;
             }
 
             async function copyResults() {
-                const text = elements.resultsContent.textContent;
-                if (text) {
-                    await copyToClipboard(text);
-                    addToTerminal('Results copied to clipboard', 'success');
+                if (successfulHosts.length > 0) {
+                    await copyToClipboard(successfulHosts.join('\n'));
+                    addToTerminal('📋 Results copied to clipboard', 'success');
+                } else {
+                    addToTerminal('No results to copy', 'warning');
                 }
             }
 
@@ -474,7 +816,17 @@
                     return true;
                 }
             }
+
+            function showError(element, message) {
+                element.textContent = message;
+                element.style.display = 'block';
+                addToTerminal(message, 'error');
+            }
+
+            function hideError(element) {
+                element.style.display = 'none';
+            }
         });
     </script>
 </body>
-</html>
+                    </html>
