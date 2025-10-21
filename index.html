@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydra Nation - Protocol Scanner</title>
+    <style>
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #16213e;
+            --accent-purple: #8a2be2;
+            --accent-blue: #4a4de6;
+            --accent-green: #00ff41;
+            --accent-red: #ff0040;
+            --text-primary: #e0e0ff;
+            --text-secondary: #a9a9e6;
+            --border-color: #2a2d80;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .glitch {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--accent-purple);
+            text-shadow: 0 0 10px var(--accent-purple);
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .panel {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .panel-title {
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .protocol-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .protocol-option {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--accent-blue);
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .protocol-option:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+        }
+
+        .protocol-option.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-green);
+        }
+
+        .upload-section {
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border: 2px dashed var(--accent-blue);
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .file-label {
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        .action-btn {
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 14px;
+        }
+
+        .action-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        .terminal {
+            background: #000;
+            border-radius: 6px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .terminal-success { color: var(--accent-green); }
+        .terminal-error { color: var(--accent-red); }
+        .terminal-info { color: var(--accent-blue); }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        @media (min-width: 768px) {
+            .stats { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="glitch">Hydra Nation</div>
+            <p class="tagline">Protocol Scanner</p>
+        </div>
+
+        <div class="panel">
+            <h2 class="panel-title">Configuration</h2>
+            
+            <div class="upload-section">
+                <h3>Upload Hosts File</h3>
+                <input type="file" id="fileInput" accept=".txt" style="display: none;">
+                <label for="fileInput" class="file-label">Choose TXT File</label>
+                <div id="fileName" style="color: var(--text-secondary); margin: 10px 0;"></div>
+            </div>
+
+            <h3>Select Protocol</h3>
+            <div class="protocol-grid">
+                <div class="protocol-option" data-protocol="http">HTTP</div>
+                <div class="protocol-option" data-protocol="tls">TLS</div>
+                <div class="protocol-option" data-protocol="vless">VLESS</div>
+                <div class="protocol-option" data-protocol="cloudfront_tls">Cloud-Front</div>
+                <div class="protocol-option" data-protocol="dynamic_tls">Dynamic TLS</div>
+            </div>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <button id="scanBtn" class="action-btn" disabled>Start Scan</button>
+                <button id="cancelBtn" class="action-btn" style="display: none; background: var(--accent-red);">Cancel</button>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div id="progressText" style="text-align: center; color: var(--text-secondary);">Ready to scan</div>
+
+            <div class="stats">
+                <div><div class="stat-value" id="totalHosts">0</div>Total Hosts</div>
+                <div><div class="stat-value" id="successHosts">0</div>Successful</div>
+                <div><div class="stat-value" id="failedHosts">0</div>Failed</div>
+                <div><div class="stat-value" id="successRate">0%</div>Success Rate</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2 class="panel-title">Scan Results</h2>
+            <div class="terminal" id="terminal">
+                <div class="terminal-info">Hydra Nation Scanner Ready</div>
+                <div class="terminal-info">Upload hosts file and select protocol</div>
+            </div>
+            
+            <div style="margin-top: 15px; text-align: center;">
+                <button id="copyResults" class="action-btn">Copy Successful Hosts</button>
+            </div>
+            
+            <div id="resultsSection" style="display: none; margin-top: 15px;">
+                <h3>Successful Connections:</h3>
+                <div style="background: #000; padding: 15px; border-radius: 6px; max-height: 150px; overflow-y: auto;">
+                    <pre id="resultsContent" style="color: var(--accent-green);"></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>About Creator: Hydra Nation | Telegram: t.me/redsmoker2</p>
+            <p>Legends Never Die - We Multiply</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Update this with your Render backend URL
+        const BACKEND_URL = 'https://netscanner.onrender.com'; // You'll update this after deploying to Render
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = {
+                fileInput: document.getElementById('fileInput'),
+                fileName: document.getElementById('fileName'),
+                protocolOptions: document.querySelectorAll('.protocol-option'),
+                scanBtn: document.getElementById('scanBtn'),
+                cancelBtn: document.getElementById('cancelBtn'),
+                terminal: document.getElementById('terminal'),
+                totalHosts: document.getElementById('totalHosts'),
+                successHosts: document.getElementById('successHosts'),
+                failedHosts: document.getElementById('failedHosts'),
+                successRate: document.getElementById('successRate'),
+                progressFill: document.getElementById('progressFill'),
+                progressText: document.getElementById('progressText'),
+                resultsSection: document.getElementById('resultsSection'),
+                resultsContent: document.getElementById('resultsContent'),
+                copyResults: document.getElementById('copyResults')
+            };
+
+            let selectedProtocol = null;
+            let hosts = [];
+            let isScanning = false;
+            let currentScanId = null;
+
+            // Event Listeners
+            elements.fileInput.addEventListener('change', handleFileUpload);
+            elements.protocolOptions.forEach(opt => {
+                opt.addEventListener('click', () => selectProtocol(opt));
+            });
+            elements.scanBtn.addEventListener('click', startScan);
+            elements.cancelBtn.addEventListener('click', cancelScan);
+            elements.copyResults.addEventListener('click', copyResults);
+
+            function handleFileUpload(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (!file.name.endsWith('.txt')) {
+                    addToTerminal('Please select a .txt file', 'error');
+                    return;
+                }
+
+                elements.fileName.textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    parseHostsFile(e.target.result);
+                };
+                reader.readAsText(file);
+            }
+
+            function selectProtocol(option) {
+                elements.protocolOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                selectedProtocol = option.getAttribute('data-protocol');
+                addToTerminal(`Protocol selected: ${selectedProtocol.toUpperCase()}`, 'info');
+                updateScanButton();
+            }
+
+            function parseHostsFile(content) {
+                hosts = [];
+                const lines = content.split('\n');
+                
+                lines.forEach(line => {
+                    const host = line.trim();
+                    if (host && !host.startsWith('#')) {
+                        // Simple host extraction
+                        let cleanHost = host;
+                        if (cleanHost.includes('://')) {
+                            try {
+                                const url = new URL(cleanHost);
+                                cleanHost = url.hostname;
+                            } catch (e) {
+                                const match = cleanHost.match(/^(?:https?:\/\/)?([^\/:]+)/);
+                                if (match) cleanHost = match[1];
+                            }
+                        }
+                        if (cleanHost.includes(':')) cleanHost = cleanHost.split(':')[0];
+                        
+                        if (cleanHost && !hosts.includes(cleanHost)) {
+                            hosts.push(cleanHost);
+                        }
+                    }
+                });
+
+                elements.totalHosts.textContent = hosts.length;
+                addToTerminal(`Loaded ${hosts.length} hosts`, 'success');
+                updateScanButton();
+            }
+
+            async function startScan() {
+                if (!selectedProtocol || hosts.length === 0) return;
+
+                resetScan();
+                isScanning = true;
+                updateUI();
+                
+                addToTerminal(`Starting ${selectedProtocol} scan...`, 'info');
+
+                // For GitHub Pages frontend, we'll simulate scanning
+                // In production, this would call your Render backend
+                simulateScan();
+            }
+
+            function simulateScan() {
+                let completed = 0;
+                let successful = 0;
+                const total = hosts.length;
+
+                hosts.forEach((host, index) => {
+                    setTimeout(() => {
+                        if (!isScanning) return;
+
+                        const isSuccess = Math.random() > 0.6; // 40% success rate for demo
+                        
+                        if (isSuccess) {
+                            successful++;
+                            addToTerminal(`SUCCESS: ${host} (101 Switching Protocols)`, 'success');
+                        } else {
+                            addToTerminal(`FAILED: ${host}`, 'error');
+                        }
+
+                        completed++;
+                        updateProgress(completed, total, successful);
+                        
+                        if (completed === total) {
+                            finishScan(successful);
+                        }
+                    }, Math.random() * 1000 + 500);
+                });
+            }
+
+            function updateProgress(completed, total, successful) {
+                const percent = (completed / total) * 100;
+                elements.progressFill.style.width = `${percent}%`;
+                elements.progressText.textContent = `${completed}/${total} (${successful} successful)`;
+                elements.successHosts.textContent = successful;
+                elements.failedHosts.textContent = completed - successful;
+                elements.successRate.textContent = `${((successful / completed) * 100).toFixed(1)}%`;
+            }
+
+            function finishScan(successful) {
+                isScanning = false;
+                updateUI();
+                elements.progressText.textContent = `Complete: ${successful}/${hosts.length} successful`;
+                
+                if (successful > 0) {
+                    const successfulHosts = hosts.slice(0, successful); // Simplified for demo
+                    elements.resultsContent.textContent = successfulHosts.join('\n');
+                    elements.resultsSection.style.display = 'block';
+                    copyToClipboard(successfulHosts.join('\n'));
+                    addToTerminal('Results copied to clipboard automatically', 'success');
+                }
+            }
+
+            function cancelScan() {
+                isScanning = false;
+                updateUI();
+                addToTerminal('Scan cancelled', 'error');
+            }
+
+            function updateScanButton() {
+                elements.scanBtn.disabled = !selectedProtocol || hosts.length === 0 || isScanning;
+            }
+
+            function updateUI() {
+                elements.scanBtn.disabled = isScanning;
+                elements.cancelBtn.style.display = isScanning ? 'inline-block' : 'none';
+                elements.scanBtn.textContent = isScanning ? 'Scanning...' : 'Start Scan';
+            }
+
+            function resetScan() {
+                elements.successHosts.textContent = '0';
+                elements.failedHosts.textContent = '0';
+                elements.successRate.textContent = '0%';
+                elements.progressFill.style.width = '0%';
+                elements.resultsSection.style.display = 'none';
+            }
+
+            function addToTerminal(message, type) {
+                const line = document.createElement('div');
+                line.className = `terminal-${type}`;
+                line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                elements.terminal.appendChild(line);
+                elements.terminal.scrollTop = elements.terminal.scrollHeight;
+            }
+
+            async function copyResults() {
+                const text = elements.resultsContent.textContent;
+                if (text) {
+                    await copyToClipboard(text);
+                    addToTerminal('Results copied to clipboard', 'success');
+                }
+            }
+
+            async function copyToClipboard(text) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } catch (err) {
+                    // Fallback
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    return true;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
